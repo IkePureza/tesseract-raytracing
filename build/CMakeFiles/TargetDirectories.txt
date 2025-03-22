@@ -1,0 +1,3 @@
+/Users/henriqueadmin/Workspace/tesseract/build/CMakeFiles/raytracer.dir
+/Users/henriqueadmin/Workspace/tesseract/build/CMakeFiles/edit_cache.dir
+/Users/henriqueadmin/Workspace/tesseract/build/CMakeFiles/rebuild_cache.dir
