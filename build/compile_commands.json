@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/henriqueadmin/Workspace/tesseract/build",
-  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/henriqueadmin/Workspace/tesseract -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk -include rtweekend.h -o CMakeFiles/raytracer.dir/main.cpp.o -c /Users/henriqueadmin/Workspace/tesseract/main.cpp",
-  "file": "/Users/henriqueadmin/Workspace/tesseract/main.cpp",
-  "output": "CMakeFiles/raytracer.dir/main.cpp.o"
-}
-]

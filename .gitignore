@@ -1,0 +1,40 @@
+# Build directories
+/build/
+/bin/
+/lib/
+/out/
+
+# CMake specific
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+_deps/
+*.cmake
+!CMakeLists.txt
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Language specific
+# C/C++
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.out
+*.app
+*.gch
+*.pch
+
+# Dependency directories
+vcpkg_installed/
