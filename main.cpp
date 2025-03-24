@@ -3,6 +3,7 @@
 #include "hittable.h"
 #include "hittable_list.h"
 #include "material.h"
+#include "quad.h"
 #include "rtweekend.h"
 #include "sphere.h"
 
@@ -16,7 +17,145 @@ color ray_color(const ray &r, const hittable &world) {
   return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
 }
 
-int main() {
+void quads() {
+  hittable_list world;
+
+  // Materials
+  auto left_red = make_shared<lambertian>(color(1.0, 0.2, 0.2));
+  auto back_green = make_shared<lambertian>(color(0.2, 1.0, 0.2));
+  auto right_blue = make_shared<lambertian>(color(0.2, 0.2, 1.0));
+  auto upper_orange = make_shared<lambertian>(color(1.0, 0.5, 0.0));
+  auto lower_teal = make_shared<lambertian>(color(0.2, 0.8, 0.8));
+
+  // Quads
+  world.add(make_shared<quad>(point3(-3, -2, 5), vec3(0, 0, -4), vec3(0, 4, 0),
+                              left_red));
+  world.add(make_shared<quad>(point3(-2, -2, 0), vec3(4, 0, 0), vec3(0, 4, 0),
+                              back_green));
+  world.add(make_shared<quad>(point3(3, -2, 1), vec3(0, 0, 4), vec3(0, 4, 0),
+                              right_blue));
+  world.add(make_shared<quad>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4),
+                              upper_orange));
+  world.add(make_shared<quad>(point3(-2, -3, 5), vec3(4, 0, 0), vec3(0, 0, -4),
+                              lower_teal));
+
+  camera cam;
+
+  cam.aspect_ratio = 1.0;
+  cam.image_width = 400;
+  cam.samples_per_pixel = 100;
+  cam.max_depth = 50;
+
+  cam.vfov = 80;
+  cam.lookfrom = point3(0, 0, 9);
+  cam.lookat = point3(0, 0, 0);
+  cam.vup = vec3(0, 1, 0);
+
+  cam.defocus_angle = 0;
+
+  cam.render(world);
+}
+
+void mirrors() {
+  hittable_list world;
+
+  auto albedo = color(0.8, 0.8, 0.8);
+  /*auto fuzz = 0;*/
+  auto fuzz = random_double(0, 0.5);
+
+  // Materials
+  auto left = make_shared<metal>(albedo, fuzz);
+  auto back = make_shared<metal>(albedo, fuzz);
+  auto right = make_shared<metal>(albedo, fuzz);
+  auto upper = make_shared<metal>(albedo, fuzz);
+  auto lower = make_shared<metal>(albedo, fuzz);
+
+  // Quads
+  world.add(make_shared<quad>(point3(-3, -2, 5), vec3(0, 0, -4), vec3(0, 4, 0),
+                              left));
+  world.add(
+      make_shared<quad>(point3(-2, -2, 0), vec3(4, 0, 0), vec3(0, 4, 0), back));
+  world.add(
+      make_shared<quad>(point3(3, -2, 1), vec3(0, 0, 4), vec3(0, 4, 0), right));
+  world.add(
+      make_shared<quad>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4), upper));
+  world.add(make_shared<quad>(point3(-2, -3, 5), vec3(4, 0, 0), vec3(0, 0, -4),
+                              lower));
+
+  auto lambertian_material =
+      make_shared<lambertian>(color(0.7, 0.3, 0.3)); // Reddish color
+
+  // Inner cube - 3 times smaller and centered
+  // Assuming the outer cube has dimensions roughly 6x6x6,
+  // the inner cube will be 2x2x2 (1/3 the size)
+  // Inner cube - centered in the mirror box
+  double inner_size = 2.0 / 3.0;
+
+  // Calculate center of the outer cube based on its coordinates
+  // The outer cube seems to be roughly centered around (0, 0, 2.5)
+  // So let's place the inner cube there, but moved slightly forward (closer to
+  // camera)
+  point3 inner_center(0, 0, 3); // Moved forward in z-direction
+
+  // Front face (facing the camera)
+  world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
+                                     inner_center.y() - inner_size,
+                                     inner_center.z() + inner_size),
+                              vec3(2 * inner_size, 0, 0),
+                              vec3(0, 2 * inner_size, 0), lambertian_material));
+
+  // Back face
+  world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
+                                     inner_center.y() - inner_size,
+                                     inner_center.z() - inner_size),
+                              vec3(2 * inner_size, 0, 0),
+                              vec3(0, 2 * inner_size, 0), lambertian_material));
+
+  // Left face
+  world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
+                                     inner_center.y() - inner_size,
+                                     inner_center.z() - inner_size),
+                              vec3(0, 0, 2 * inner_size),
+                              vec3(0, 2 * inner_size, 0), lambertian_material));
+
+  // Right face
+  world.add(make_shared<quad>(point3(inner_center.x() + inner_size,
+                                     inner_center.y() - inner_size,
+                                     inner_center.z() - inner_size),
+                              vec3(0, 0, 2 * inner_size),
+                              vec3(0, 2 * inner_size, 0), lambertian_material));
+
+  // Top face
+  world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
+                                     inner_center.y() + inner_size,
+                                     inner_center.z() - inner_size),
+                              vec3(2 * inner_size, 0, 0),
+                              vec3(0, 0, 2 * inner_size), lambertian_material));
+
+  // Bottom face
+  world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
+                                     inner_center.y() - inner_size,
+                                     inner_center.z() - inner_size),
+                              vec3(2 * inner_size, 0, 0),
+                              vec3(0, 0, 2 * inner_size), lambertian_material));
+  camera cam;
+
+  cam.aspect_ratio = 1.0;
+  cam.image_width = 400;
+  cam.samples_per_pixel = 100;
+  cam.max_depth = 50;
+
+  cam.vfov = 80;
+  cam.vup = vec3(0, 1, 0);
+  cam.lookfrom = point3(5, 5, 5); // Position diagonally from the cube
+  cam.lookat = point3(inner_size, 0, inner_size);
+
+  cam.defocus_angle = 0;
+
+  cam.render(world);
+}
+
+void spheres() {
   hittable_list world;
 
   auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
@@ -76,4 +215,18 @@ int main() {
   cam.defocus_angle = 0.6;
   cam.focus_dist = 10.0;
   cam.render(world);
+}
+
+int main() {
+  switch (3) {
+  case 1:
+    spheres();
+    break;
+  case 2:
+    quads();
+    break;
+  case 3:
+    mirrors();
+    break;
+  }
 }
