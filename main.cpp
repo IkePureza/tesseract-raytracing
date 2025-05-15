@@ -26,6 +26,7 @@ void quads() {
   auto right_blue = make_shared<lambertian>(color(0.2, 0.2, 1.0));
   auto upper_orange = make_shared<lambertian>(color(1.0, 0.5, 0.0));
   auto lower_teal = make_shared<lambertian>(color(0.2, 0.8, 0.8));
+  auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
 
   // Quads
   world.add(make_shared<quad>(point3(-3, -2, 5), vec3(0, 0, -4), vec3(0, 4, 0),
@@ -45,6 +46,8 @@ void quads() {
   cam.image_width = 400;
   cam.samples_per_pixel = 100;
   cam.max_depth = 50;
+
+  cam.background = color(0.70, 0.80, 1.00);
 
   cam.vfov = 80;
   cam.lookfrom = point3(0, 0, 9);
@@ -69,6 +72,7 @@ void mirrors() {
   auto right = make_shared<metal>(albedo, fuzz);
   auto upper = make_shared<metal>(albedo, fuzz);
   auto lower = make_shared<metal>(albedo, fuzz);
+  auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
 
   // Quads
   world.add(make_shared<quad>(point3(-3, -2, 5), vec3(0, 0, -4), vec3(0, 4, 0),
@@ -126,11 +130,10 @@ void mirrors() {
                               vec3(0, 2 * inner_size, 0), lambertian_material));
 
   // Top face
-  world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
-                                     inner_center.y() + inner_size,
-                                     inner_center.z() - inner_size),
-                              vec3(2 * inner_size, 0, 0),
-                              vec3(0, 0, 2 * inner_size), lambertian_material));
+  world.add(make_shared<quad>(
+      point3(inner_center.x() - inner_size, inner_center.y() + inner_size,
+             inner_center.z() - inner_size),
+      vec3(2 * inner_size, 0, 0), vec3(0, 0, 2 * inner_size), difflight));
 
   // Bottom face
   world.add(make_shared<quad>(point3(inner_center.x() - inner_size,
@@ -144,6 +147,8 @@ void mirrors() {
   cam.image_width = 400;
   cam.samples_per_pixel = 100;
   cam.max_depth = 50;
+
+  cam.background = color(0.70, 0.80, 1.00);
 
   cam.vfov = 80;
   cam.vup = vec3(0, 1, 0);
